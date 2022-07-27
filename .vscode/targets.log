@@ -1,4 +1,5 @@
 make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
 MAKE Version 5.2  Copyright (c) 1987, 1998 Inprise Corp.
-Fatal: Unable to open makefile
+Error makefile 11: Command syntax error
+*** 1 errors during make ***
  

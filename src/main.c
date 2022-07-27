@@ -92,11 +92,7 @@ esp_err_t mulai_uart() {
 esp_err_t mulai_kamera() {
   // initialize the camera
   esp_err_t err = esp_camera_init(&konfig_kamera);
-  if (err != ESP_OK) {
-    return err;
-  }
-
-  return ESP_OK;
+  return err;
 }
 
 esp_err_t mulai_led() {
@@ -104,18 +100,41 @@ esp_err_t mulai_led() {
   return gpio_set_direction(BUILT_IN_LED, GPIO_MODE_OUTPUT);
 }
 
+// esp_err_t kamera_tangkap() {
+//   // acquire a frame
+//   camera_fb_t* fb = esp_camera_fb_get();
+//   if (!fb) {
+//     return ESP_FAIL;
+//   }
+//   // replace this with your own function
+//   process_image(fb->width, fb->height, fb->format, fb->buf, fb->len);
+
+//   // return the frame buffer back to the driver for reuse
+//   esp_camera_fb_return(fb);
+//   return ESP_OK;
+// }
+
 void app_main() {
-  mulai_kamera();
   mulai_led();
   mulai_uart();
+  if (mulai_kamera() == ESP_OK) {
+    uart_write_bytes(UART_NUM_1, "\nKAMERA BERHASIL DIMULAI!\n", 26);
+  } else {
+    uart_write_bytes(UART_NUM_1, "\nKAMERA GAGAL DIMULAI!\n", 23);
+  }
   uint8_t i = 0;
+  TickType_t t0 = 0;
+  uint32_t tNow = 0;
+  uint8_t *bufr = (uint8_t *)malloc(UART_BUF_SIZE);
   while (1) {
-    char teks[2];
-    sprintf(teks, "%d", i % 2);
-    teks[1] = '\n';
-    uart_write_bytes(UART_NUM_1, &teks, sizeof(teks));
-    gpio_set_level(BUILT_IN_LED, i % 2);
-    vTaskDelay(3000 / portTICK_RATE_MS);
-    i++;
+    if (tNow - t0 > 100) {
+      uint8_t len = uart_read_bytes(UART_NUM_1, bufr, UART_BUF_SIZE,
+                                    20 / portTICK_RATE_MS);
+      gpio_set_level(BUILT_IN_LED, i % 2);
+      uart_write_bytes(UART_NUM_1, &len, 1);
+      i++;
+      t0 = tNow;
+    }
+    tNow = xTaskGetTickCount();
   }
 }
