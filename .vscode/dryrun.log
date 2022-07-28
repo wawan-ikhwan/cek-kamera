@@ -1,6 +1,8 @@
-make.exe --dry-run --keep-going --print-directory
+make.exe --dry-run --always-make --keep-going --print-directory
 MAKE Version 5.2  Copyright (c) 1987, 1998 Inprise Corp.
 Incorrect command line argument: --dry-run
+
+Incorrect command line argument: --always-make
 
 Incorrect command line argument: --keep-going
 
